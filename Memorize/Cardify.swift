@@ -16,11 +16,12 @@ struct Cardify: ViewModifier{
             if isFacedUp {
                 shape.fill().foregroundColor(.blue)
                 shape.strokeBorder(lineWidth: DrawingConstants.lineWidth).foregroundColor(.blue)
-                content
             } else {
                 shape.fill().foregroundColor(/*@START_MENU_TOKEN@*/.orange/*@END_MENU_TOKEN@*/)
                 shape.strokeBorder(lineWidth: 1.5).foregroundColor(.orange)
             }
+            content
+                .opacity(isFacedUp ? 1 : 0)
         }
         .padding()
 
