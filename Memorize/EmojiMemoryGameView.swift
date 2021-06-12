@@ -19,7 +19,7 @@ struct EmojiMemoryGameView: View {
                 Text("Best score: \(game.model.scores.min() ?? 0)")
             }.padding(.all)
             
-            AspectVGrid(items: game.model.cards.filter {!$0.isMatched},aspectRatio: 2/3) {cardView(for: $0)}
+            AspectVGrid(items: game.model.cards,aspectRatio: 2/3) {cardView(for: $0)}
             
             Spacer()
             
@@ -58,7 +58,10 @@ struct CardView: View {
                     Pie(startAngle: Angle(degrees: -90), endAngle: Angle(degrees: 20), clockWise: false)
                         .padding(DrawingConstants.circlePadding)
                         .opacity(DrawingConstants.circleOpacity)
-                    Text(card.content).font(getFont(in: geometry.size))
+                    Text(card.content)
+                        .rotationEffect(Angle.degrees(card.isMatched ? 360 : 0))
+                        .animation(.linear(duration:1).repeatForever(autoreverses: false))
+                        .font(getFont(in: geometry.size))
                 }
             .cardify(isFacedUp: card.isFacedUp)
         })

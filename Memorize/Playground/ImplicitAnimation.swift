@@ -29,7 +29,10 @@ struct AnimationView: View {
             .padding()
             .font(/*@START_MENU_TOKEN@*/.title/*@END_MENU_TOKEN@*/)
             .foregroundColor(isScary ? .primary : .secondary)
-            .border(Color.primary, width: 0.5)
+            .border(Color.primary, width: isScary ? 0.2 : 2)
+            .scaleEffect()
+            .animation(.easeInOut)
+
             Spacer()
         }
     }
