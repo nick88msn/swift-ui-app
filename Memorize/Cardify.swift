@@ -24,6 +24,10 @@ struct Cardify: ViewModifier{
                 .opacity(isFacedUp ? 1 : 0)
         }
         .padding()
+        .rotation3DEffect(
+            Angle.degrees(isFacedUp ? 0 : 180),
+            axis: (x: 0.0, y: 1.0, z: 0.0)
+        )
 
     }
     

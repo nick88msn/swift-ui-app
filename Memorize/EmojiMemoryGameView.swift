@@ -13,41 +13,69 @@ struct EmojiMemoryGameView: View {
     
     var body: some View {
         VStack{
-            HStack{
-                Text("Current Score: \(game.model.current_score)")
-                Spacer()
-                Text("Best score: \(game.model.scores.min() ?? 0)")
-            }.padding(.all)
-            
+            scoreView
             AspectVGrid(items: game.model.cards,aspectRatio: 2/3) {cardView(for: $0)}
-            
             Spacer()
-            
-            HStack{
-                Button(action: {
-                    game.reset()
-                }, label: {
-                    Text("New Game")
-                        .font(.title)
-                })
-            }.padding(.vertical)
+            actionView
         }
     }
+    
+    var scoreView: some View {
+        HStack{
+            Text("Current Score: \(game.model.current_score)")
+            Spacer()
+            Text("Best score: \(game.model.scores.min() ?? 0)")
+        }.padding(.all)
+    }
+    
+    var actionView: some View {
+        HStack{
+            newGameButton
+            shuffleButton
+        }.padding(.all)
+    }
+    
+    var newGameButton: some View{
+        HStack{
+            Button(action: {
+                withAnimation{
+                    game.reset()
+                }
+            }, label: {
+                Text("New Game")
+                    .font(.title3)
+            })
+        }
+    }
+    
+    var shuffleButton: some View {
+        Button(action: {
+            withAnimation {
+                game.shuffle()
+            }
+        }, label: {
+            Text("Shuffle")
+                .font(.title3)
+        })
+    }
+    
     
     @ViewBuilder
     private func cardView(for card: EmojiMemoryGame.Card) -> some View {
         if card.isMatched && !card.isFacedUp{
-            Rectangle().opacity(0)
+            //Rectangle().opacity(0)
+            Color.clear
         } else {
             CardView(card: card)
                 .onTapGesture {
-                    game.choose(card)
+                    withAnimation(.easeInOut){
+                        game.choose(card)
+                    }
                 }
             .padding()
         }
         }
 }
-
 
 struct CardView: View {
     let card: MemoryGame<String>.Card
@@ -60,7 +88,7 @@ struct CardView: View {
                         .opacity(DrawingConstants.circleOpacity)
                     Text(card.content)
                         .rotationEffect(Angle.degrees(card.isMatched ? 360 : 0))
-                        .animation(.linear(duration:1).repeatForever(autoreverses: false))
+                        .animation(.linear(duration:3))
                         //.font(getFont(in: geometry.size)) //using variable font with animation makes some junky cases
                         .font(Font.system(size: DrawingConstants.fontSize))
                         .scaleEffect(scale(thatFits: geometry.size))

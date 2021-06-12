@@ -46,6 +46,15 @@ struct MemoryGame<CardContent> where CardContent: Equatable{
         }
         cards.shuffle()
     }
+    
+    mutating func shuffle(){
+        for index in cards.indices {
+            cards[index].isMatched = false
+            cards[index].isFacedUp = false
+        }
+        current_score = 0
+        cards.shuffle()
+    }
         
     init(numberOfPairsOfCards: Int, createCardContent: (Int) -> CardContent) {
         cards = []
@@ -54,8 +63,8 @@ struct MemoryGame<CardContent> where CardContent: Equatable{
             let content = createCardContent(pairIndex)
             cards.append(Card(id: pairIndex * 2, content: content))
             cards.append(Card(id: pairIndex * 2 + 1,content: content))
-            cards.shuffle()
         }
+        cards.shuffle()
         current_score = 0
         scores = []
         
