@@ -11,10 +11,27 @@ struct EmojiMemoryGameView: View {
     @ObservedObject var game: EmojiMemoryGame
     @State var minZoom: CGFloat = 100
     
+    @State private var dealt = Set<Int>()
+    
+    private func deal(_ card: EmojiMemoryGame.Card) {
+        dealt.insert(card.id)
+    }
+    
+    private func isUndealt(_ card: EmojiMemoryGame.Card) -> Bool {
+        return !dealt.contains(card.id)
+    }
+    
     var body: some View {
         VStack{
             scoreView
-            AspectVGrid(items: game.model.cards,aspectRatio: 2/3) {cardView(for: $0)}
+            AspectVGrid(items: game.model.cards,aspectRatio: 2/3, content: {cardView(for: $0)})
+                .onAppear{
+                    withAnimation {
+                        for card in game.model.cards {
+                            deal(card)
+                        }
+                    }
+                }
             Spacer()
             actionView
         }
@@ -63,11 +80,12 @@ struct EmojiMemoryGameView: View {
     
     @ViewBuilder
     private func cardView(for card: EmojiMemoryGame.Card) -> some View {
-        if card.isMatched && !card.isFacedUp{
+        if isUndealt(card) || (card.isMatched && !card.isFacedUp){
             //Rectangle().opacity(0)
             Color.clear
         } else {
             CardView(card: card)
+                .transition(AnyTransition.asymmetric(insertion: .scale, removal: .opacity).animation(.easeInOut))
                 .onTapGesture {
                     withAnimation(.easeInOut){
                         game.choose(card)
