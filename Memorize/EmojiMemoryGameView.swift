@@ -23,26 +23,12 @@ struct EmojiMemoryGameView: View {
     
     var body: some View {
         VStack{
-            scoreView
-            AspectVGrid(items: game.model.cards,aspectRatio: 2/3, content: {cardView(for: $0)})
-                .onAppear{
-                    withAnimation {
-                        for card in game.model.cards {
-                            deal(card)
-                        }
-                    }
-                }
-            Spacer()
             actionView
-        }
-    }
-    
-    var scoreView: some View {
-        HStack{
-            Text("Current Score: \(game.model.current_score)")
+            AspectVGrid(items: game.model.cards,aspectRatio: 2/3, content: {cardView(for: $0)})
             Spacer()
-            Text("Best score: \(game.model.scores.min() ?? 0)")
-        }.padding(.all)
+            scoreView
+            deckBody
+        }
     }
     
     var actionView: some View {
@@ -53,6 +39,33 @@ struct EmojiMemoryGameView: View {
         }.padding(.all)
     }
     
+    var scoreView: some View {
+        HStack{
+            Text("Current Score: \(game.model.current_score)")
+            Spacer()
+            Text("Best score: \(game.model.scores.min() ?? 0)")
+        }.padding(.all)
+    }
+    
+    var deckBody: some View {
+        ZStack{
+            ForEach(game.model.cards.filter(isUndealt)){ card in
+                CardView(card: card)
+                    .transition(AnyTransition.scale.animation(.easeIn(duration: 2)))
+            }
+        }
+        .frame(width: CardCostants.undealtWidth, height: CardCostants.undealtHeight)
+        .foregroundColor(CardCostants.color)
+        .onTapGesture {
+            withAnimation {
+                for card in game.model.cards {
+                    deal(card)
+                }
+            }
+        }
+
+    }
+
     var newGameButton: some View{
         HStack{
             Button(action: {
@@ -77,6 +90,15 @@ struct EmojiMemoryGameView: View {
         })
     }
     
+    private struct CardCostants {
+        static let color = Color.red
+        static let aspectRatio: CGFloat = 2/3
+        static let dealDuration: Double = 0.5
+        static let totalDealDuration: Double = 2
+        static let undealtHeight: CGFloat = 90
+        static let undealtWidth: CGFloat = undealtHeight * aspectRatio
+    }
+    
     
     @ViewBuilder
     private func cardView(for card: EmojiMemoryGame.Card) -> some View {
@@ -85,7 +107,7 @@ struct EmojiMemoryGameView: View {
             Color.clear
         } else {
             CardView(card: card)
-                .transition(AnyTransition.asymmetric(insertion: .scale, removal: .opacity).animation(.easeInOut))
+                .transition(AnyTransition.asymmetric(insertion: .scale, removal: .opacity).animation(.easeInOut(duration: 2)))
                 .onTapGesture {
                     withAnimation(.easeInOut){
                         game.choose(card)
