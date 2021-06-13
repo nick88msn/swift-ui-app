@@ -7,13 +7,24 @@
 
 import SwiftUI
 
-struct Cardify: ViewModifier{
-    var isFacedUp: Bool
+struct Cardify: AnimatableModifier {
+    init(isFaceUp: Bool){
+        rotation = isFaceUp ? 0 : 180
+    }
+    
+    // To handle cards' flipping animation we need to keep track of the rotation angle
+    var animatableData: Double {
+        get { rotation }
+        set { rotation = newValue }
+    }
+    
+    var rotation: Double
+
     
     func body(content: Content) -> some View {
         ZStack {
             let shape = RoundedRectangle(cornerRadius: DrawingConstants.cornerRadius)
-            if isFacedUp {
+            if rotation < 90 {
                 shape.fill().foregroundColor(.blue)
                 shape.strokeBorder(lineWidth: DrawingConstants.lineWidth).foregroundColor(.blue)
             } else {
@@ -21,11 +32,11 @@ struct Cardify: ViewModifier{
                 shape.strokeBorder(lineWidth: 1.5).foregroundColor(.orange)
             }
             content
-                .opacity(isFacedUp ? 1 : 0)
+                .opacity(rotation < 90 ? 1 : 0)
         }
         .padding()
         .rotation3DEffect(
-            Angle.degrees(isFacedUp ? 0 : 180),
+            Angle.degrees(rotation),
             axis: (x: 0.0, y: 1.0, z: 0.0)
         )
 
@@ -40,7 +51,7 @@ struct Cardify: ViewModifier{
 
 
 extension View{
-    func cardify(isFacedUp:Bool) -> some View{
-        modifier(Cardify(isFacedUp: isFacedUp))
+    func cardify(isFaceUp:Bool) -> some View{
+        modifier(Cardify(isFaceUp: isFaceUp))
     }
 }

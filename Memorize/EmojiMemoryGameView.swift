@@ -31,6 +31,7 @@ struct EmojiMemoryGameView: View {
     var actionView: some View {
         HStack{
             newGameButton
+            Spacer()
             shuffleButton
         }.padding(.all)
     }
@@ -86,14 +87,15 @@ struct CardView: View {
                     Pie(startAngle: Angle(degrees: -90), endAngle: Angle(degrees: 20), clockWise: false)
                         .padding(DrawingConstants.circlePadding)
                         .opacity(DrawingConstants.circleOpacity)
-                    Text(card.content)
                         .rotationEffect(Angle.degrees(card.isMatched ? 360 : 0))
                         .animation(.linear(duration:3))
+
+                    Text(card.content)
                         //.font(getFont(in: geometry.size)) //using variable font with animation makes some junky cases
                         .font(Font.system(size: DrawingConstants.fontSize))
                         .scaleEffect(scale(thatFits: geometry.size))
                 }
-            .cardify(isFacedUp: card.isFacedUp)
+            .cardify(isFaceUp: card.isFacedUp)
         })
     }
         
